@@ -1,0 +1,62 @@
+---
+title: "stage_three"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(jsonlite)
+
+# --- 1. The Custom Function ---
+# This pulls any World Bank indicator for the whole world
+get_world_data <- function(indicator_code) {
+  
+  # URL for all countries, years 2000-2024
+  my_url <- paste0("https://api.worldbank.org/v2/country/all/indicator/", 
+                   indicator_code, "?format=json&per_page=17000&date=2000:2024")
+  
+  # Fetch data
+  raw_content <- fromJSON(my_url)
+  table_data <- raw_content[[2]]
+  
+  # Build the tibble
+  tibble(
+    country = table_data$country$value,
+    iso_code = table_data$countryiso3code,
+    year = as.numeric(table_data$date),
+    value = as.numeric(table_data$value),
+    variable = indicator_code
+  )
+}
+
+# --- 2. Iteration (Acquiring the data) ---
+# We use Maternal Mortality and GDP per capita
+my_indicators <- c("SH.STA.MMRT", "NY.GDP.PCAP.CD")
+
+# map_df runs the function for both and stacks them
+global_raw_data <- map_df(my_indicators, get_world_data)
+
+# --- 3. Tidying the Global Dataset ---
+global_study_tidy <- global_raw_data %>%
+  # Move indicators into their own columns (This is the "Tidying" requirement)
+  pivot_wider(names_from = variable, values_from = value) %>%
+  # Rename for clarity
+  rename(
+    maternal_mortality = SH.STA.MMRT,
+    gdp_per_cap = NY.GDP.PCAP.CD
+  ) %>%
+  # Remove rows that are missing the main health indicator
+  drop_na(maternal_mortality) %>%
+  # Remove "World" and "Region" aggregates to keep only actual countries
+  # (World Bank aggregate ISOs usually start with digits or are special codes)
+  filter(!iso_code %in% c("WLD", "HIC", "MIC", "LIC", "LMY"))
+
+# --- 4. Save and View ---
+write_csv(global_study_tidy, "global_maternal_health_study.csv")
+
+# Quick look at the dimensions (should be thousands of rows now!)
+print(paste("Total Observations:", nrow(global_study_tidy)))
+head(global_study_tidy)
+```
+
