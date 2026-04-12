@@ -41,3 +41,68 @@ songs_df <- songs %>%
 write_csv(songs_df, "billboard_hot100.csv")
 ```
 
+```{r}
+library(tidyverse)
+library(rvest)
+library(lubridate)
+
+# make all Saturdays from Jan 1 of this year to today
+start_date <- as.Date(paste0(year(Sys.Date()), "-01-01"))
+end_date <- Sys.Date()
+
+all_days <- seq.Date(start_date, end_date, by = "day")
+chart_dates <- all_days[wday(all_days, label = FALSE) == 7]   # Saturday
+
+chart_dates
+```
+```{r}
+get_billboard_chart <- function(chart_date) {
+  url <- paste0("https://www.billboard.com/charts/hot-100/", chart_date, "/")
+  
+  message("Trying: ", url)
+  
+  page <- read_html(url)
+  
+  songs <- page %>% html_elements("li ul li")
+  
+  songs_df <- songs %>%
+    map_df(~{
+      title_node <- .x %>% html_node("h3")
+      title <- if (!is.na(title_node)) html_text(title_node, trim = TRUE) else NA_character_
+      
+      artist_vec <- .x %>%
+        html_elements("span") %>%
+        html_text(trim = TRUE)
+      
+      artist_vec <- artist_vec[artist_vec != ""]
+      artist <- if (length(artist_vec) > 0) artist_vec[1] else NA_character_
+      
+      tibble(
+        song_title = title,
+        artist = artist
+      )
+    }) %>%
+    filter(!is.na(song_title), song_title != "") %>%
+    mutate(
+      rank = row_number(),
+      chart_date = as.Date(chart_date)
+    )
+  
+  songs_df
+}
+```
+
+```{r}
+charts_list <- map(chart_dates, get_billboard_chart)
+```
+
+```{r}
+all_charts <- bind_rows(charts_list)
+```
+
+
+```{r}
+write_csv(all_charts, "billboard_hot100_ytd.csv")
+```
+
+
