@@ -3,3 +3,41 @@ title: "you_the_birthday"
 format: html
 ---
 
+```{r}
+library(rvest)
+library(tidyverse)
+```
+
+```{r}
+url <- "https://www.billboard.com/charts/hot-100/"
+page <- read_html(url)
+
+songs <- page %>% html_nodes("li ul li")
+```
+
+```{r}
+songs_df <- songs %>%
+  map_df(~{
+    title <- .x %>% html_node("h3") %>% html_text(trim = TRUE)
+    
+    artist <- .x %>%
+      html_nodes("span") %>%
+      html_text(trim = TRUE)
+    
+    # Keep only the FIRST non-empty artist-like text
+    artist <- artist[artist != ""][1]
+    
+    tibble(
+      song_title = title,
+      artist = artist
+    )
+  }) %>%
+  filter(song_title != "") %>%
+  mutate(rank = row_number())
+```
+
+
+```{r}
+write_csv(songs_df, "billboard_hot100.csv")
+```
+
