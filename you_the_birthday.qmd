@@ -1,6 +1,6 @@
 ---
 title: "you_the_birthday"
-format: html
+format: pdf
 ---
 
 ```{r}
