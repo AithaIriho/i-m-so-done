@@ -1,9 +1,15 @@
 ---
-title: "you_the_birthday"
-format: pdf
+title: "Mini Project: Stage Three"
+author: "Aitha, Isimbi, Lelo"
+format:
+  pdf:
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
+#| include: FALSE
 library(tidyverse)
 library(rvest)
 library(lubridate)
@@ -11,14 +17,15 @@ library(lubridate)
 
 
 ```{r}
-
 # step 1 : getting the dates
 
-# making January 1st of this year as the start date and today's date as the end date
+# making January 1st of this year as the start date 
+# and making today's date as the end date
 start_date <- as.Date(paste0(year(Sys.Date()), "-01-01"))
 end_date <- Sys.Date()
 
-# oultine all the days from jan 1st to today's date but keeps only saturdays(seventh day of the week in lubridate) because that is when the billboard updates
+# oultine all the days from jan 1st to today's date 
+# but keeps only saturdays because that is when the billboard updates
 all_days <- seq.Date(start_date, end_date, by = "day")
 chart_dates <- all_days[wday(all_days, label = FALSE) == 7] 
 
@@ -28,10 +35,9 @@ chart_dates # list of all the Saturdays from Jan 1st till today
 
 
 ```{r}
- 
 # step 2: making a function to scrape the Billboard data specified chart dates
 
-#making custom links based on specified chart dates
+# making custom links based on specified chart dates
 
 get_billboard_chart <- function(chart_date) {
   url <- paste0("https://www.billboard.com/charts/hot-100/", chart_date, "/")
@@ -42,14 +48,16 @@ get_billboard_chart <- function(chart_date) {
   
   songs <- page %>% html_elements("li ul li")
  
-# extracting  existing song title stored in the h3 node and get rid of the white spaces, if the title is not there then it is recorded as an NA 
+# extracting  existing song title stored in the h3 node 
+# and gets rid of the white spaces, and records missing values as NA 
   
-  songs_df <- songs %>%
-    map_df(~{
-      title_node <- .x %>% html_node("h3")
-      title <- if (!is.na(title_node)) html_text(title_node, trim = TRUE) else NA_character_
+songs_df <- songs %>%
+  map_df(~{
+    title_node <- .x %>% html_node("h3")
+    title <- if (!is.na(title_node)) html_text(title_node, trim = TRUE) else NA_character_
  
-# extracting artist name  located in the span element and removing the white spaces
+# extracting artist name  located in the span element 
+# and removing the white spaces
                 
       artist_vec <- .x %>%
         html_elements("span") %>%
@@ -66,7 +74,10 @@ get_billboard_chart <- function(chart_date) {
       )
     }) %>%
     
- # removing the rows with empty or missing row titles and adding the ranking based on position in list and convert make proper date formating, finally all this information is stored in a single data frame 
+ # removing the rows with empty or missing row titles
+ # adding the ranking based on position in list 
+ # and convert make proper date formatting
+ # and finally all this information is stored in a single data frame 
      
     filter(!is.na(song_title), song_title != "") %>%
     mutate(
@@ -79,10 +90,10 @@ get_billboard_chart <- function(chart_date) {
 ```
 
 ```{r}
+# step 3 : applying the function from step 2 to the specified dates in step 1 
+# and getting one data set
 
-#step 3 : applying the function from step 2 to the specified dates in step 1 and getting one data set
-
-#making a data frame list for every date
+# making a data frame list for every date
 
 charts_list <- map(chart_dates, get_billboard_chart)
 
@@ -94,7 +105,7 @@ all_charts <- bind_rows(charts_list)
 
 
 ```{r}
-#step 4 : making a csv file from the data set in step 3
+# step 4 : making a csv file from the data set in step 3
 
 write_csv(all_charts, "billboard_hot100_2026.csv")
 ```

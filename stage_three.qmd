@@ -59,4 +59,3 @@ write_csv(global_study_tidy, "global_maternal_health_study.csv")
 print(paste("Total Observations:", nrow(global_study_tidy)))
 head(global_study_tidy)
 ```
-
