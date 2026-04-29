@@ -8,22 +8,52 @@ editor_options:
 ---
 
 ```{r}
-library(httr2)
+#| include: FALSE
+
 library(tidyverse)
+library(stringr)
+library(httr2)
+library(httr)
+library(tidycensus)
 library(jsonlite)
+```
 
-# 1. Create the request
-req <- request("https://www.fruityvice.com/api/fruit/all") 
+```{r}
 
-# 2. Perform the request and parse the JSON
-resp <- req %>% 
-  req_perform() %>% 
-  resp_body_json()
 
-# 3. Turn the list into a tidy tibble
-fruit_data <- tibble(data = resp) %>%
-  unnest_wider(data) %>%
-  unnest_wider(nutritions) # Flatten the nested nutrition list
+url <- "https://api.nobelprize.org/2.1/laureates"
 
-print(fruit_data)
+laureate <- GET(url)   
+laureate               
+
+details <- content(laureate, "parsed")
+
+details                
+names(details)
+
+
+```
+
+
+```{r}
+
+#name = character()
+#population = double()
+#median_income = double()
+#tract = character()
+
+#for(i in 2:330) {
+  #name[i-1] <- details[[i]][[1]][1]
+  #population[i-1] <- details[[i]][[2]][1]
+  #median_income[i-1] <- details[[i]][[3]][1]
+  #tract[i-1] <- details[[i]][[6]][1]
+#}
+#hennepin_httr <- tibble(
+#  name = name,
+#  population = parse_number(population),
+#  median_income = parse_number(median_income),
+#  tract = tract
+#)
+#hennepin_httr
+
 ```
