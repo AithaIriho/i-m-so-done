@@ -1,0 +1,29 @@
+---
+title: "Mini-project2"
+author: "Isimbi"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(httr2)
+library(tidyverse)
+library(jsonlite)
+
+# 1. Create the request
+req <- request("https://www.fruityvice.com/api/fruit/all") 
+
+# 2. Perform the request and parse the JSON
+resp <- req %>% 
+  req_perform() %>% 
+  resp_body_json()
+
+# 3. Turn the list into a tidy tibble
+fruit_data <- tibble(data = resp) %>%
+  unnest_wider(data) %>%
+  unnest_wider(nutritions) # Flatten the nested nutrition list
+
+print(fruit_data)
+```
