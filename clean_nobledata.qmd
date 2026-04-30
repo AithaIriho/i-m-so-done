@@ -29,7 +29,6 @@ details <- content(laureate, "parsed")
 
 ```
 
-
 ```{r}
 
 n <- length(details$laureates)
