@@ -20,7 +20,7 @@ library(jsonlite)
 #| message: FALSE
 #| warning: FALSE
 
-url <- "https://api.nobelprize.org/2.1/laureates"
+url <- "https://api.nobelprize.org/2.1/laureates?limit=1000"
 
 laureate <- GET(url)   
 laureate               
