@@ -1,0 +1,64 @@
+---
+title: "clean_nobeldata"
+format: pdf
+editor: visual
+---
+
+```{r}
+#| include: FALSE
+
+library(tidyverse)
+library(stringr)
+library(httr2)
+library(httr)
+library(tidycensus)
+library(jsonlite)
+```
+
+```{r}
+
+#| message: FALSE
+#| warning: FALSE
+
+url <- "https://api.nobelprize.org/2.1/laureates"
+
+laureate <- GET(url)   
+laureate               
+
+details <- content(laureate, "parsed")
+
+```
+
+
+```{r}
+
+n <- length(details$laureates)
+
+for (i in 1:n) {
+   laur <- details$laureates[[i]]
+   
+  name[i] <- laur$knownName$en
+  birth_year[i] <- laur$birth$year
+  prize_year[i] <- laur[["nobelPrizes"]][[1]][["awardYear"]]
+    category[i] <- laur$nobelPrizes[[1]]$category$en
+    gender[i]   <- laur$gender
+    prize_money[i] <- laur$nobelPrizes[[1]]$prizeAmount 
+     country[i] <- if (!is.null(laur$birth$place$country$en)) {
+    laur$birth$place$country$en
+  } else {
+    NA
+  }
+}
+
+noble <- tibble(
+  name = name,
+  birth_year = parse_number(birth_year),
+  category = category,
+  prize_year = prize_year,
+  amount = prize_money,
+  Birth_country = country,
+  gender = gender
+)
+
+noble
+```
