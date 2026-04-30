@@ -16,32 +16,60 @@ library(jsonlite)
 ```
 
 ```{r}
+#Part 1 : Getting the data and details from API 
 
 #| message: FALSE
 #| warning: FALSE
 
-url <- "https://api.nobelprize.org/2.1/laureates?limit=1000"
+# The API endpoint for Nobel Prize laureates
 
+url <- "https://api.nobelprize.org/2.1/laureates?limit=2000"
+
+# Requesting data from the API
 laureate <- GET(url)   
 laureate               
 
+# Parsing the JSON response into an R list structure
 details <- content(laureate, "parsed")
 
 ```
 
-```{r}
 
+```{r}
+#Part2 : Creating a for loop to extract the desired variables
+
+# Assigning the number of observations for the loop
 n <- length(details$laureates)
+
+Nobel_data <- tibble(Laureate_name = character(), birth_year = double(), category = character(), prize_year = double(), prize_money = double(), country = character(), gender = character())
 
 for (i in 1:n) {
    laur <- details$laureates[[i]]
+# Getting the laureate sublist to simplify our loop
    
-  name[i] <- laur$knownName$en
-  birth_year[i] <- laur$birth$year
+# Use fullName in place missing values of knowName
+  Laureate_name[i] <-  NA
+  if (!is.null(laur$knownName$en)) {
+   Laureate_name [i] <- laur$knownName$en
+  } else if (!is.null(laur$fullName$en)) {
+   Laureate_name[i] <- laur$fullName$en
+  }
+  
+# Assigning missing values of birth_year as NA 
+  birth_year[i] <- if (!is.null(laur$birth$year)) laur$birth$year 
+                else NA
+  
+# Retrieving prize_year and category from their locations
   prize_year[i] <- laur[["nobelPrizes"]][[1]][["awardYear"]]
     category[i] <- laur$nobelPrizes[[1]]$category$en
-    gender[i]   <- laur$gender
+    
+# Assigning missing values of gender as NA 
+    gender[i]   <- if (!is.null(laur$gender)) laur$gender 
+                else NA 
+    
     prize_money[i] <- laur$nobelPrizes[[1]]$prizeAmount 
+    
+# Assigning missing values of country as NA 
      country[i] <- if (!is.null(laur$birth$place$country$en)) {
     laur$birth$place$country$en
   } else {
@@ -49,15 +77,33 @@ for (i in 1:n) {
   }
 }
 
-noble <- tibble(
-  name = name,
-  birth_year = parse_number(birth_year),
-  category = category,
-  prize_year = prize_year,
-  amount = prize_money,
+# Creating tibble of each laureate with specified variables
+Nobel_data <- tibble(
+  Name = Laureate_name,
+  Birth_year = as.numeric(birth_year),
+  Category = category,
+  Prize_year =  as.numeric(prize_year),
+  Amount = as.numeric(prize_money),
   Birth_country = country,
-  gender = gender
+  Gender = gender
 )
 
-noble
+# Final dataset with all observations and variables
+Nobel_data 
+
+```
+
+
+```{r}
+# Creating new variable, age of laureate when they won the Nobel
+Nobel_data |>
+  mutate(Age = Prize_year - Birth_year )
+```
+
+
+
+```{r}
+# Creating a csv file from the dataset 
+
+write_csv(Nobel_data, "Nobel_Data.csv")
 ```
