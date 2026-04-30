@@ -1,5 +1,6 @@
 ---
-title: "clean_nobeldata"
+title: "Nobel Prize Data"
+author: "Isimbi Mutoni, Aithat Iriho, Mvuselelo Mathunjwa"
 format: pdf
 editor: visual
 ---
@@ -7,6 +8,7 @@ editor: visual
 ```{r}
 #| include: FALSE
 
+# Loading all necessary libraries
 library(tidyverse)
 library(stringr)
 library(httr2)
@@ -41,7 +43,14 @@ details <- content(laureate, "parsed")
 # Assigning the number of observations for the loop
 n <- length(details$laureates)
 
-Nobel_data <- tibble(Laureate_name = character(), birth_year = double(), category = character(), prize_year = double(), prize_money = double(), country = character(), gender = character())
+# Defining all storage vectors before the for loop
+Laureate_name <- character(n)
+birth_year <- character(n)
+prize_year <- character(n)
+category <- character(n)
+gender <- character(n)
+prize_money <- numeric(n)
+country <- character(n)
 
 for (i in 1:n) {
    laur <- details$laureates[[i]]
@@ -95,15 +104,15 @@ Nobel_data
 
 
 ```{r}
-# Creating new variable, age of laureate when they won the Nobel
-Nobel_data |>
+# Part 3: Creating new variable, age of laureate when they won the Nobel
+Nobel_final_data <- Nobel_data |>
   mutate(Age = Prize_year - Birth_year )
 ```
 
 
 
 ```{r}
-# Creating a csv file from the dataset 
+# Part 4: Creating a csv file from the dataset 
 
-write_csv(Nobel_data, "Nobel_Data.csv")
+write_csv(Nobel_final_data, "Nobel_final_Data.csv")
 ```
