@@ -36,7 +36,6 @@ details <- content(laureate, "parsed")
 
 ```
 
-
 ```{r}
 #Part2 : Creating a for loop to extract the desired variables
 
@@ -102,14 +101,11 @@ Nobel_data
 
 ```
 
-
 ```{r}
 # Part 3: Creating new variable, age of laureate when they won the Nobel
 Nobel_final_data <- Nobel_data |>
   mutate(Age = Prize_year - Birth_year )
 ```
-
-
 
 ```{r}
 # Part 4: Creating a csv file from the dataset 
