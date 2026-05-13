@@ -1,10 +1,21 @@
 ---
-title: "The Nobel Prize"
-output: 
+output:
   flexdashboard::flex_dashboard:
-    orientation: rows
-    vertical_layout: fill
-runtime: shiny
+    theme:
+      version: 4
+      bg: "#101010"
+      fg: "#FDF7F7" 
+      primary: "#ED79F9"
+      navbar-bg: "#3ADAC6"
+      base_font: 
+        google: Prompt
+      heading_font:
+        google: Sen
+      code_font:
+        google: 
+          # arguments to sass::font_google() 
+          family: JetBrains Mono
+          local: false
 ---
 
 ```{r global, include=FALSE}
