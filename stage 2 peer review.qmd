@@ -1,0 +1,48 @@
+---
+title: "stage 2 peer review"
+format: html
+---
+
+```{r}
+library(tidyverse)
+
+Nobel <- read_csv("Nobel_final_Data.csv")
+```
+
+```{r}
+ggplot(Nobel, aes(x = Prize_year)) +
+  geom_histogram() +
+  labs(
+    title = "Distribution of Nobel Laureates Over Time",
+    x = "Year",
+    y = "Count")
+```
+
+```{r}
+ggplot(Nobel, aes(x = Gender)) +
+  geom_bar() +
+  labs(
+    title = "Number of Laureates by Gender",
+    x = "Gender",
+    y = "Count")
+```
+
+
+```{r}
+ggplot(Nobel, aes(x = Category, fill = Gender)) +
+  geom_bar(position = "fill") +
+  labs(
+    title = "Proportion of Gender by Category",
+    x = "Category",
+    y = "Proportion")
+```
+
+```{r}
+ggplot(Nobel, aes(x = Gender, y = Amount)) +
+  geom_boxplot() +
+  labs(
+    title = "Prize Amount Distribution by Gender",
+    x = "Gender",
+    y = "Prize Amount")
+```
+
