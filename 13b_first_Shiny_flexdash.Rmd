@@ -1,21 +1,11 @@
 ---
-output:
+title: "The Nobel Prize"
+output: 
   flexdashboard::flex_dashboard:
-    theme:
-      version: 4
-      bg: "#101010"
-      fg: "#FDF7F7" 
-      primary: "#ED79F9"
-      navbar-bg: "#3ADAC6"
-      base_font: 
-        google: Prompt
-      heading_font:
-        google: Sen
-      code_font:
-        google: 
-          # arguments to sass::font_google() 
-          family: JetBrains Mono
-          local: false
+    theme: darkly
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
 ---
 
 ```{r global, include=FALSE}
