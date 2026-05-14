@@ -1,21 +1,7 @@
 ---
-output:
-  flexdashboard::flex_dashboard:
-    theme:
-      version: 4
-      bg: "#101010"
-      fg: "#FDF7F7" 
-      primary: "#ED79F9"
-      navbar-bg: "#3ADAC6"
-      base_font: 
-        google: Prompt
-      heading_font:
-        google: Sen
-      code_font:
-        google: 
-          # arguments to sass::font_google() 
-          family: JetBrains Mono
-          local: false
+title: "Nobel prize data"
+output: flexdashboard::flex_dashboard
+runtime: shiny
 ---
 
 ```{r global, include=FALSE}
@@ -27,25 +13,16 @@ library(ggplot2)
 Intro
 ==========================
 
-### ABOUT THE PROJECT
-
-Column {data-width = 55}
+Column {data-width = 200}
 -------------------------
 
-In this project, we analyze Nobel Prize data collected from the official Nobel Prize API.  
-Our dataset contains information about laureates such as:
+**Background Information**
 
-- Age
-- Gender
-- Birth country
-- Prize category
-- Prize amount
-- Year awarded
+For our final project, we are analyzing data found on the official Nobel Prize website. Information we grabbed with the Nobel Prize API includes information about the Nobel Prize Laureates like : age, gender, birth date, birth country, prize amount, prize category, and their names. With this project, our goal is to identify historical patterns as well as potential inequalities in Nobel Prize awards by answering key questions. 
 
-The goal of this project is to explore historical trends and identify possible inequalities in Nobel Prize awards across time, gender, and regions of the world.
 -------------------------
 
-### DATA SOURCES
+**Data sources **
 
 we accessed our data from the Nobel Prize website
 
