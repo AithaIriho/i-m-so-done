@@ -1,25 +1,20 @@
 ---
-output:
+title: "The Nobel Prize"
+output: 
   flexdashboard::flex_dashboard:
-    theme:
-      version: 4
-      bg: "#101010"
-      fg: "#FDF7F7" 
-      primary: "#ED79F9"
-      navbar-bg: "#3ADAC6"
-      base_font: 
-        google: Prompt
-      heading_font:
-        google: Sen
-      code_font:
-        google: 
-          # arguments to sass::font_google() 
-          family: JetBrains Mono
-          local: false
+    vertical_layout: fill
+    theme: flatly
+runtime: shiny
 ---
 
+
 ```{r global, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE
+)
+
 library(tidyverse)
 library(ggplot2)
 ```
@@ -27,39 +22,36 @@ library(ggplot2)
 Intro
 ==========================
 
-### ABOUT THE PROJECT
-
-Column {data-width = 55}
+Column {data-width=800}
 -------------------------
 
-In this project, we analyze Nobel Prize data collected from the official Nobel Prize API.  
-Our dataset contains information about laureates such as:
 
-- Age
-- Gender
-- Birth country
-- Prize category
-- Prize amount
-- Year awarded
+#### Background Information
 
-The goal of this project is to explore historical trends and identify possible inequalities in Nobel Prize awards across time, gender, and regions of the world.
+The Nobel Prize is one of the most prestigious international awards, recognizing individuals and organizations that have made major contributions to science, literature, economics, and peace. 
+
+In this Shiny dashboard, we analyze Nobel Prize data collected from the official Nobel Prize API. The dataset includes information about laureates such as age, gender, birth country, prize category, prize amount, and year awarded.
+
+Using this project, we explore historical trends in Nobel Prize awards across different time periods and categories. We also investigate patterns related to gender representation and geographical distribution in order to better understand inequalities and changes in recognition over time.
+
+
+
+#### Data Sources
+
+- [Nobel Prize Website](https://www.nobelprize.org/)
+- [Nobel Prize API Page](https://www.nobelprize.org/about/developer-zone-2/)
+- [Nobel Prize API](https://api.nobelprize.org/2.1/laureates)
+
+#### GitHub
+
+Here's a link to our [code](https://github.com/)
+
+Column
 -------------------------
 
-### DATA SOURCES
-
-we accessed our data from the Nobel Prize website
-
-- [Website](https://www.nobelprize.org/) 
-
-- [Page with the API](https://www.nobelprize.org/about/developer-zone-2/)
-
-- [API](https://api.nobelprize.org/2.1/laureates)
-
--------------------------
-
-**Link to Github**
- 
-[code] ()
+```{r, out.width="60%"}
+knitr::include_graphics("nobel_medal.webp.png")
+```
  
 Patterns
 ==========================
