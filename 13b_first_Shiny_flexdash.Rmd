@@ -1,14 +1,9 @@
 ---
-<<<<<<< HEAD
-title: "Nobel prize data"
-output: flexdashboard::flex_dashboard
-=======
 title: "The Nobel Prize"
 output: 
   flexdashboard::flex_dashboard:
     vertical_layout: fill
     theme: flatly
->>>>>>> 20799537ec7ccaca658bcaa49cec4aee4dab1259
 runtime: shiny
 ---
 
@@ -26,35 +21,6 @@ library(ggplot2)
 
 Intro
 ==========================
-
-<<<<<<< HEAD
-Column {data-width = 200}
--------------------------
-
-**Background Information**
-
-For our final project, we are analyzing data found on the official Nobel Prize website. Information we grabbed with the Nobel Prize API includes information about the Nobel Prize Laureates like : age, gender, birth date, birth country, prize amount, prize category, and their names. With this project, our goal is to identify historical patterns as well as potential inequalities in Nobel Prize awards by answering key questions. 
-
--------------------------
-
-**Data sources **
-
-we accessed our data from the Nobel Prize website
-
-- [Website](https://www.nobelprize.org/) 
-
-- [Page with the API](https://www.nobelprize.org/about/developer-zone-2/)
-
-- [API](https://api.nobelprize.org/2.1/laureates)
-
--------------------------
-
-**Link to Github**
- 
-[code] ()
-=======
-Column {data-width=800}
--------------------------
 
 
 #### Background Information
@@ -80,10 +46,10 @@ Here's a link to our [code](https://github.com/)
 Column
 -------------------------
 
-```{r, out.width="60%"}
+```{r, out.width="40%"}
 knitr::include_graphics("nobel_medal.webp.png")
 ```
->>>>>>> 20799537ec7ccaca658bcaa49cec4aee4dab1259
+
  
 Patterns
 ==========================
@@ -151,36 +117,104 @@ ggplot(nobel, aes(x = Cent, fill = Category)) +
 
 New emerging categories such as economic sciences, literature is declining 
 
-Tidyverse
+Maps
 ==========================
 
-Inputs {.sidebar}
--------------------------
+```{r}
+library(leaflet)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(dplyr)
+library(sf)
+library(tidyr)
 
-```{r, echo=FALSE}
-inputPanel(
-  selectInput("n_breaks2", label = "Number of bins:",
-              choices = c(5, 10, 15, 20, 25, 30), selected = 15),
-  
-  sliderInput("bw_adjust2", label = "Bandwidth adjustment:",
-              min = 0.1, max = 3, value = 1.2, step = 0.1)
+# creating a country_count data set with names matching earth data
+nobel_count <- Nobel |>
+  filter(!is.na(Birth_country)) |>
+  mutate(Birth_country = recode(Birth_country,
+    "USA"                               = "United States of America",
+    "the Netherlands"                   = "Netherlands",
+    "South Korea"                       = "South Korea",
+    "Korea"                             = "South Korea",
+    "USSR"                              = "Russia",
+    "Russian Empire"                    = "Russia",
+    "Prussia"                           = "Germany",
+    "Bavaria"                           = "Germany",
+    "Mecklenburg"                       = "Germany",
+    "Württemberg"                       = "Germany",
+    "Hesse-Kassel"                      = "Germany",
+    "West Germany"                      = "Germany",
+    "East Friesland"                    = "Germany",
+    "Schleswig"                         = "Germany",
+    "Free City of Danzig"               = "Poland",
+    "German-occupied Poland"            = "Poland",
+    "Austria-Hungary"                   = "Austria",
+    "Austrian Empire"                   = "Austria",
+    "Ottoman Empire"                    = "Turkey",
+    "Persia"                            = "Iran",
+    "British Protectorate of Palestine" = "Israel",
+    "British Mandate of Palestine"      = "Israel",
+    "British India"                     = "India",
+    "Burma"                             = "Myanmar",
+    "Tuscany"                           = "Italy",
+    "Gold Coast"                        = "Ghana",
+    "Belgian Congo"                     = "Dem. Rep. Congo",
+    "Southern Rhodesia"                 = "Zimbabwe",
+    "French Algeria"                    = "Algeria",
+    "French protectorate of Tunisia"    = "Tunisia",
+    "Czechoslovakia"                    = "Czechia",
+    "East Timor"                        = "Timor-Leste",
+    "Java, Dutch East Indies"           = "Indonesia",
+    "Faroe Islands (Denmark)"           = "Denmark",
+    "Guadeloupe, France"                = "France",
+    "British West Indies"               = "Trinidad and Tobago",
+    "Crete"                             = "Greece",
+    "Scotland"                          = "United Kingdom",
+    "Northern Ireland"                  = "United Kingdom",
+    "Tibet"                             = "China",
+    "Bosnia"                            = "Bosnia and Herz."
+  )) |>
+  group_by(Birth_country) |>
+  summarise(total = n()) # getting the counts for each country as total
+
+# creating a data set with country coordinates and boundaries 
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Merging our country_count data set with the coordinate data set
+world_nobel <- world |>
+  left_join(nobel_count, by = c("name" = "Birth_country")) |>
+  mutate(total = replace_na(total, 0)) #replacing nas with 0 
+
+# selecting a color palette and assigning bins 
+pal <- colorBin(
+  palette  = "YlOrRd",
+  domain   = world_nobel$total[world_nobel$total > 0],
+  bins     = c(1, 5, 10, 25, 50, 100, 300),
+  na.color = "#f0f0f0"
 )
+
+# Map 
+leaflet(world_nobel) |>
+  addProviderTiles(providers$CartoDB.Positron) |>
+  setView(lng = 0, lat = 20, zoom = 2) |>
+  addPolygons(
+    fillColor    = ~ifelse(total == 0, "#f0f0f0", pal(ifelse(total == 0, NA, total))),
+    fillOpacity  = ~ifelse(total == 0, 0.3, 0.8),
+    color        = "white",
+    weight       = 0.5,
+    label        = ~paste0(name, ": ", ifelse(total == 0, "None", paste0(total, " Nobel Prize(s)"))),# saying none for countries without prizes
+    highlight    = highlightOptions(
+      weight       = 3,
+      color        = "#333",
+      bringToFront = TRUE
+    )
+  ) |>
+  addLegend(
+    pal      = pal,
+    values   = world_nobel$total[world_nobel$total > 0],
+    title    = "Nobel Prizes",
+    position = "bottomright",
+    labFormat = labelFormat(suffix = " prizes")
+  )
 ```
-
-Column 
--------------------------
-
-### Age distribution
-
-```{r, echo=FALSE}
-renderPlot({
-  ggplot(nobel, aes(x = Age)) +
-    geom_histogram(aes(y = after_stat(density)), 
-                   bins = as.numeric(input$n_breaks2),
-                   fill = "white", colour = "black") +
-    geom_density(adjust = input$bw_adjust2, colour = "blue") +
-    labs(x = "Age", title = "Age distribution")
-})
-```
-
 
