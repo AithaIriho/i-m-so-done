@@ -8,7 +8,6 @@ output:
 runtime: shiny
 ---
 
-
 ```{r global, include=FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,
@@ -67,25 +66,6 @@ Nnobel <- Nobel |>
   drop_na(Prize_year)
 
 ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
-  geom_line(colour = "lightblue") +
-  labs(
-    title = "Distribution of Nobel Laureates Over Time",
-    x = "Year",
-    y = "Count") +
-  theme_minimal()
-```
-
-
-Column
--------------------------
-
-```{r, echo=FALSE}
-Nnobel <- Nobel |>
-  group_by(Prize_year) |>
-  summarise(number_of_laureates = n()) |>
-  drop_na(Prize_year)
-
-ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
   geom_point( colour = "orange") +
   geom_smooth(se = FALSE, colour = "pink") +
   labs(
@@ -131,6 +111,25 @@ highchart() |>
 Column
 -------------------------
 
+```{r}
+library(ggplot2)
+library(dplyr)
+
+Nobbel <- Nobel |>
+  drop_na(Age)
+
+ggplot(data = Nobbel, aes(x = Age)) +
+  geom_histogram() +
+  labs(title = "Laureate Age Distribution", x = "Age", y = "Count") +
+  theme_minimal()
+```
+
+Gender analysis
+==========================
+
+Column
+-------------------------
+
 ```{r, echo=FALSE}
 library(dplyr)
 
@@ -161,76 +160,8 @@ highchart() |>
 ```
 
 
-Patterns
-==========================
-
 Column
 -------------------------
-
-
-```{r, echo=FALSE}
-library(tidyverse)
-
-Nobel <- read_csv("Nobel_final_Data.csv")
-
-ggplot(Nobel, aes(x = Prize_year)) +
-  geom_histogram() +
-  labs(
-    title = "Distribution of Nobel Laureates Over Time",
-    x = "Year",
-    y = "Count")
-```
-
-Column 
--------------------------
-
-# Nobel Prizes by Gender & Period
-
-```{r echo = FALSE}
-library(ggplot2)
-library(dplyr)
-
-nobel <- Nobel |>
-  mutate(Cent = case_when(
-    Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
-    Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
-    Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
-    Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
-    Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
-  )) |>
-  drop_na(Gender)
-
-ggplot(nobel, aes(x = Cent, fill = Gender)) +
-  geom_bar(position = "fill") +
-  labs(title = "Nobel Prizes by Gender & Period", x = "time frame", y = "proportion")
-```
-
-Men have received the most awards throughout the years. More than 80% percents of the laureates are males. The number of women Nobel Prize winners has increased in the past half century but they are still evidently low.  
-
-Column
--------------------------
-
-# Nobel Prizes by category & Period
-
-```{r echo = FALSE}
-library(ggplot2)
-library(dplyr)
-
-nobel <- nobel |>
-  mutate(Category = fct_rev(fct_infreq(Category)))
-
-ggplot(nobel, aes(x = Cent, fill = Category)) +
-  geom_bar(position = "fill") +
-  labs(title = "Nobel Prizes by Gender & Period", x = "time frame", y = "proportion") +
-  theme_classic() +
-  scale_fill_viridis_d()
-```
-
-New emerging categories such as economic sciences, literature is declining 
-
-
-Gender Analysis
-==========================
 
 ```{r, echo=FALSE}
 Nobel_6 <- Nobel |>
@@ -246,21 +177,6 @@ highchart() |>
   hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
 ```
 
-Column
--------------------------
-
-```{r}
-library(ggplot2)
-library(dplyr)
-
-Nobbel <- Nobel |>
-  drop_na(Age)
-
-ggplot(data = Nobbel, aes(x = Age)) +
-  geom_histogram() +
-  labs(title = "Laureate Age Distrbution", x = "Age", y = "Count") +
-  theme_minimal()
-```
 
 Column
 -------------------------
@@ -275,26 +191,15 @@ ggplot(Nobel, aes(x = Gender, y = Age)) +
 Column
 -------------------------
 
-```{r, echo = FALSE}
-library(dplyr)
+```{r}
+Nobeel <- Nobel |>
+  drop_na(Gender, Amount) 
 
-Nobell <- Nobel |>
-  filter(!is.na(Birth_country)) |>
-  count(Birth_country, sort = TRUE) |>
-  slice_max(n, n = 10)
-
-highchart() |>
-  hc_add_series(data = Nobell,
-                type = "column", 
-                hcaes(x = Birth_country,
-                      y = n)) |>
-  hc_xAxis(categories = unique(Nobell$Birth_country),
-    title = list(text = "Country")) |>
-  hc_yAxis(title = list(text="Number of Prizes")) |>
-  hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
-
+ggplot(Nobeel, aes(x = Gender, y = Amount)) +
+  geom_boxplot() +
+  labs(title = "Nobel Prize Amount by Gender", x = "Gender", y = "Prize Amount") +
+  theme_minimal()
 ```
-
 
 Maps
 ==========================
@@ -400,19 +305,29 @@ leaflet(world_nobel) |>
   )
 ```
 
-
 Column
 -------------------------
 
-```{r}
-Nobeel <- Nobel |>
-  drop_na(Gender, Amount) 
+```{r, echo = FALSE}
+library(dplyr)
 
-ggplot(Nobeel, aes(x = Gender, y = Amount)) +
-  geom_boxplot() +
-  labs(title = "Nobel Prize Amount by Gender", x = "Gender", y = "Prize Amount") +
-  theme_minimal()
+Nobell <- Nobel |>
+  filter(!is.na(Birth_country)) |>
+  count(Birth_country, sort = TRUE) |>
+  slice_max(n, n = 10)
+
+highchart() |>
+  hc_add_series(data = Nobell,
+                type = "column", 
+                hcaes(x = Birth_country,
+                      y = n)) |>
+  hc_xAxis(categories = unique(Nobell$Birth_country),
+    title = list(text = "Country")) |>
+  hc_yAxis(title = list(text="Number of Prizes")) |>
+  hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
+
 ```
+
 
 Column
 -------------------------
