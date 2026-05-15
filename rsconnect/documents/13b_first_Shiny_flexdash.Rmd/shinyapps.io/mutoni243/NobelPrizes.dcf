@@ -1,0 +1,12 @@
+name: NobelPrizes
+title: NobelPrizes
+username: mutoni243
+account: mutoni243
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17366223
+bundleId: 11997711
+url: https://mutoni243.shinyapps.io/NobelPrizes/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
