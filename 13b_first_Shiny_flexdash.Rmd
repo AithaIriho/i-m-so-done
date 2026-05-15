@@ -2,7 +2,6 @@
 title: "The Nobel Prize"
 output: 
   flexdashboard::flex_dashboard:
-    theme: flatly
     css: styles.css
     orientation: rows
     vertical_layout: fill
@@ -26,7 +25,6 @@ Nobel <- read.csv("Nobel_final_data.csv")
 Introduction
 ==========================
 
-
 #### Background Information
 
 The Nobel Prize is one of the most prestigious international awards, recognizing individuals and organizations that have made major contributions to science, literature, economics, and peace. 
@@ -46,97 +44,50 @@ Using this project, we explore historical trends in Nobel Prize awards across di
 #### GitHub
 
 Here's a link to our [code](https://github.com/)
+ 
+Row {data-width=6}
+-------------------------------------
 
-Column
--------------------------
+Column {data-width=6}
+-------------------------------------
 
-```{r, out.width="40%"}
-knitr::include_graphics("nobel_medal.webp.png")
-```
+- Rosalind Franklin
 
+- Lise Meitner
+
+- Alice Ball 
+
+- Jocelyn Bell Burnell
+
+- Marthe Gautier
+
+- Cecilia Payne-Gaposchkin
+
+- Esther Lederberg 
+
+- Chien-Shiung Wu
+
+- Margaret Knight
+
+- Hedy Lamarr
+
+- Ada Lovelace
+
+ 
 Overview
 ==========================
-
-Row {data-height=400}
--------------------------
-
-```{r, echo=FALSE}
-Nnobel <- Nobel |>
-  group_by(Prize_year) |>
-  summarise(number_of_laureates = n()) |>
-  drop_na(Prize_year)
-
-ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
-  geom_point( colour = "orange") +
-  geom_smooth(se = FALSE, colour = "pink") +
-  labs(
-    title = "Distribution of Nobel Laureates Over Time",
-    x = "Year",
-    y = "Count") +
-  theme_minimal() 
-```
-
-Generally, the number of prizes given in a year increased overtime. 
-
-Row {data-height=400}
--------------------------
-
-```{r}
-library(ggplot2)
-library(dplyr)
-
- Nobel |>
-  drop_na(Age) |>
-ggplot(aes(x = Age)) +
-  geom_histogram(bins = 30, binwidth = 3.5) +
-  labs(title = "Laureate Age Distribution", x = "Age", y = "Number of Laureats") +
-  theme_minimal()
-```
-
-the median age is 65 and there are some outliers close to 100 and less than 25
-
-Row {data-height=400}
--------------------------
-
-```{r, echo=FALSE}
-Nnnobel <- Nobel |> 
-  mutate(Cent = case_when(
-    Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
-    Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
-    Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
-    Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
-    Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"),
-  Cent = factor(Cent, levels = c(
-      "1901-1925","1926-1950","1951-1975","1976-2000","2001-2025")),
-  Category = factor(Category)) |>
-  drop_na(Category, Cent) |>
-  count(Category, Cent, .drop = FALSE) 
-
-highchart() |>
-  hc_add_series(data = Nnnobel,
-                type = "column", 
-                hcaes(x = Cent ,
-                      y = n, 
-                      group = Category)) |>
-  hc_plotOptions(
-    column = list(stacking = "percent")  
-  ) |>
-  hc_xAxis(
-    categories = unique(Nnnobel$Cent),
-    title = list(text = "Cent")
-  ) |>
-  hc_yAxis(title = list(text = "Number of Prizes"))
-```
-
-
-Row {data-height=400}
--------------------------
 
 ```{r, include=FALSE}
 library(shiny)
 library(dplyr)
 library(ggplot2)
 library(flexdashboard)
+library(highcharter)
+
+Nnobel <- Nobel |>
+  group_by(Prize_year) |>
+  summarise(number_of_laureates = n()) |>
+  drop_na(Prize_year)
 
 Nnnobel <- Nobel |>
   mutate(
@@ -155,6 +106,7 @@ Nnnobel <- Nobel |>
   count(Cent, Category)
 ```
 
+
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
 
@@ -167,20 +119,52 @@ selectInput("Cent", label = "Time Period:",
 Row {data-height=400}
 -----------------------------------------------------------------------
 
-### Nobel Prize Categories
+### Nobel Prize Categories (Interactive)
 
 ```{r}
 renderPlot({
   Nnnobel |>
     filter(Cent == input$Cent) |>
     ggplot(aes(x = Category, y = n)) +
-    geom_col() +
+    geom_col(fill = "black", colour = "gold") +
     labs(title = paste("Nobel Prize Categories:", input$Cent),
          x = "Category", y = "Number of Prizes") +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 })
 ```
+
+
+### Distribution of Nobel Laureates Over Time
+
+```{r, echo=FALSE}
+ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
+  geom_point(colour = "black") +
+  geom_smooth(se = FALSE, colour = "gold") +
+  labs(title = "Distribution of Nobel Laureates Over Time",
+       x = "Year", y = "Count") +
+  theme_minimal()
+```
+
+Row {data-height=400}
+-----------------------------------------------------------------------
+
+### Laureate Age Distribution
+
+```{r}
+Nobel |>
+  drop_na(Age) |>
+  ggplot(aes(x = Age)) +
+  geom_histogram(bins = 30, binwidth = 3.5, fill = "black", colour = "gold") +
+  labs(title = "Laureate Age Distribution",
+       x = "Age", y = "Number of Laureates") +
+  theme_minimal()
+```
+
+### Comments {data-width=300}
+
+
+let us see if this works or not. god safe us 
 
 
 Gender analysis
@@ -193,14 +177,16 @@ Column
 Nobel_6 <- Nobel |>
   filter(!is.na(Gender)) |>
   count(Gender) -> Gender
-
+# Plug in dataset, choose type of chart, and x and y variable 
 highchart() |> 
   hc_chart(type ="column",
            options3d = list(enabled = TRUE, beta = 15, alpha = 15)) |>
+  # Manually pick each factor of variable for the x-axis and label it
   hc_xAxis(categories = unique(Nobel_6$Gender),
     title = list(text = "Gender")) |>
+  # Labelling y axis 
   hc_add_series(data = Gender$n, name = "Gender") |>
-  hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
+  hc_colors(c( "#d6c089"))
 ```
 
 
@@ -234,34 +220,34 @@ highchart() |>
   hc_plotOptions(series = list(animation = TRUE)) |>
   hc_legend(align = "right", 
             verticalAlign = "top") |>
-  hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
-```
-
-Column
--------------------------
-
-
-```{r}
-ggplot(Nobel, aes(x = Gender, y = Age)) +
-  geom_boxplot() +
-  labs(title = "Laureate Age by Gender", x = "Gender", y = "Age") +
-  theme_minimal()
+  hc_colors(c("#d6c089"))
 ```
 
 Column
 -------------------------
 
 ```{r}
-Nobeel <- Nobel |>
-  drop_na(Gender, Amount) 
+Nobel_10 <- Nobel |>
+  drop_na(Category, Gender) |>
+  count(Category, Gender)
 
-ggplot(Nobeel, aes(x = Gender, y = Amount)) +
-  geom_boxplot() +
-  labs(title = "Nobel Prize Amount by Gender", x = "Gender", y = "Prize Amount") +
-  theme_minimal()
+highchart() |>
+  hc_add_series(
+    data = Nobel_10,
+    type = "column",
+    hcaes(x = Category, y = n, group = Gender)
+  ) |>
+  hc_plotOptions(
+    column = list(stacking = "percent")
+  ) |>
+  hc_yAxis(
+    title = list(text = "Percentage of Laureates")
+  ) |>
+  hc_xAxis(categories = unique(Nobel_10$Category),
+    title = list(text = "Category")
+  )
 ```
-
-Maps
+Geographic Analysis
 ==========================
 
 Column
@@ -428,167 +414,9 @@ highchart() |>
   hc_xAxis(categories = unique(Nobell$Birth_country),
     title = list(text = "Country")) |>
   hc_yAxis(title = list(text="Number of Prizes")) |>
-  hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
+  hc_colors(c("#d6c089"))
 
 ```
 
 
-Column
--------------------------
 
-```{r}
-Noobel <- Nobel |>
-  drop_na(Age, Amount)
-
-highchart() |>
-  hc_add_series(
-    data = Noobel,
-    type = "scatter",
-    hcaes(x = Age, y = Amount)
-  ) |>
-  hc_xAxis(title = list(text = "Age")) |>
-  hc_yAxis(title = list(text = "Prize Amount")) |>
-  hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
-```
-
-
-
-```{r, include=FALSE}
-library(shiny)
-library(dplyr)
-library(ggplot2)
-library(flexdashboard)
-
-Nnnobel <- Nobel |>
-  mutate(
-    Cent = case_when(
-      Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
-      Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
-      Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
-      Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
-      Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
-    ),
-    Cent = factor(Cent, levels = c("1901-1925","1926-1950",
-                                   "1951-1975","1976-2000","2001-2025")),
-    Category = factor(Category)
-  ) |>
-  drop_na(Category, Cent) |>
-  count(Cent, Category)
-```
-
-Sidebar {.sidebar}
------------------------------------------------------------------------
-
-```{r}
-selectInput("Cent", label = "Time Period:",
-            choices = unique(Nnnobel$Cent),
-            selected = "1901-1925")
-```
-
-Column
------------------------------------------------------------------------
-
-### Nobel Prize Categories
-
-```{r}
-renderPlot({
-  Nnnobel |>
-    filter(Cent == input$Cent) |>
-    ggplot(aes(x = Category, y = n)) +
-    geom_col() +
-    labs(title = paste("Nobel Prize Categories:", input$Cent),
-         x = "Category", y = "Number of Prizes") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
-})
-```
-
-trial
-==========================
-
-```{r, include=FALSE}
-library(shiny)
-library(dplyr)
-library(ggplot2)
-library(flexdashboard)
-library(highcharter)
-
-Nnobel <- Nobel |>
-  group_by(Prize_year) |>
-  summarise(number_of_laureates = n()) |>
-  drop_na(Prize_year)
-
-Nnnobel <- Nobel |>
-  mutate(
-    Cent = case_when(
-      Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
-      Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
-      Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
-      Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
-      Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
-    ),
-    Cent = factor(Cent, levels = c("1901-1925","1926-1950",
-                                   "1951-1975","1976-2000","2001-2025")),
-    Category = factor(Category)
-  ) |>
-  drop_na(Category, Cent) |>
-  count(Cent, Category)
-```
-
-Sidebar {.sidebar}
------------------------------------------------------------------------
-
-```{r}
-selectInput("Cent", label = "Time Period:",
-            choices = unique(Nnnobel$Cent),
-            selected = "1901-1925")
-```
-
-Row {data-height=400}
------------------------------------------------------------------------
-
-### Nobel Prize Categories (Interactive)
-
-```{r}
-renderPlot({
-  Nnnobel |>
-    filter(Cent == input$Cent) |>
-    ggplot(aes(x = Category, y = n)) +
-    geom_col() +
-    labs(title = paste("Nobel Prize Categories:", input$Cent),
-         x = "Category", y = "Number of Prizes") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
-})
-```
-
-### Distribution of Nobel Laureates Over Time
-
-```{r, echo=FALSE}
-ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
-  geom_point(colour = "orange") +
-  geom_smooth(se = FALSE, colour = "pink") +
-  labs(title = "Distribution of Nobel Laureates Over Time",
-       x = "Year", y = "Count") +
-  theme_minimal()
-```
-
-Row {data-height=400}
------------------------------------------------------------------------
-
-### Laureate Age Distribution
-
-```{r}
-Nobel |>
-  drop_na(Age) |>
-  ggplot(aes(x = Age)) +
-  geom_histogram(bins = 30, binwidth = 3.5) +
-  labs(title = "Laureate Age Distribution",
-       x = "Age", y = "Number of Laureates") +
-  theme_minimal()
-```
-
-### Comments {data-width=300}
-
-
-let us see if this works or not. god safe us 

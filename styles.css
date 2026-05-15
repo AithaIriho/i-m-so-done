@@ -25,14 +25,14 @@ body{
   font-family: "Fraunces", Georgia, serif;
   color: var(--text);
 
-  background:
-    radial-gradient(800px 400px at 10% 0%, #fdf9f0 0%, transparent 60%),
-    var(--bg);
+ background: #000000 !important;
+  color: #ffffff;
 }
 
 /* ===============================
    CARDS (minimal luxury)
    =============================== */
+
 
 .section.level1{
   background: var(--card);
