@@ -166,9 +166,10 @@ Nobel |>
 ```
 
 
-## Comments {data-width=300}
+### comments 
+The scatterplot shows that the number of Nobel laureates generally increased over time, especially after the mid-1900s. This may reflect growing global participation and scientific development.
 
-let us see if this works or not. god safe us 
+The histogram shows that most Nobel Prize laureates receive their awards between ages 50 and 75, especially around their early 60s. This suggests that Nobel recognition often comes after many years of achievement.
 
 
 Geographic Analysis
@@ -375,13 +376,9 @@ renderPlot({
 })
 ```
 
+### Comments 
 
-
-Comments {data-width=300}
-
-
-let us see if this works or not. god safe us 
-
+Across most historical periods, Western countries dominated Nobel Prize awards, showing how scientific prestige and opportunities have not been equally distributed worldwide.
 
 Gender analysis
 ==========================
@@ -455,6 +452,11 @@ highchart() |>
 
 
 ### Comments {data-width=300}
+Nobel Prize awards have historically been dominated by male laureates, while female winners represent a much smaller share of total recipients.
+
+Female representation gradually increased across time periods, especially after 1975, showing slow progress toward greater gender inclusion.
+
+Peace and Literature show higher female representation, while categories such as Physics and Economics remain heavily male-dominated.
 
 
-let us see if this works or not. god safe us 
+ 
