@@ -5,7 +5,7 @@ account: mutoni243
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 17366223
-bundleId: 11997711
+bundleId: 11998004
 url: https://mutoni243.shinyapps.io/NobelPrizes/
 version: 1
 asMultiple: FALSE
