@@ -108,7 +108,7 @@ Nnnobel <- Nobel |>
 
 
 Sidebar {.sidebar}
------------------------------------------------------------------------
+-------------------------------------------------------------
 
 ```{r}
 selectInput("Cent", label = "Time Period:",
@@ -116,10 +116,7 @@ selectInput("Cent", label = "Time Period:",
             selected = "1901-1925")
 ```
 
-Row {data-height=400}
------------------------------------------------------------------------
-
-### Nobel Prize Categories (Interactive)
+## Nobel Prize Categories (Interactive)
 
 ```{r}
 renderPlot({
@@ -135,7 +132,7 @@ renderPlot({
 ```
 
 
-### Distribution of Nobel Laureates Over Time
+## Distribution of Nobel Laureates Over Time
 
 ```{r, echo=FALSE}
 ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
@@ -146,8 +143,6 @@ ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
   theme_minimal()
 ```
 
-Row {data-height=400}
------------------------------------------------------------------------
 
 ### Laureate Age Distribution
 
@@ -161,97 +156,19 @@ Nobel |>
   theme_minimal()
 ```
 
-### Comments {data-width=300}
 
+## Comments {data-width=300}
 
 let us see if this works or not. god safe us 
 
 
-Gender analysis
-==========================
-
-Column
--------------------------
-
-```{r, echo=FALSE}
-Nobel_6 <- Nobel |>
-  filter(!is.na(Gender)) |>
-  count(Gender) -> Gender
-# Plug in dataset, choose type of chart, and x and y variable 
-highchart() |> 
-  hc_chart(type ="column",
-           options3d = list(enabled = TRUE, beta = 15, alpha = 15)) |>
-  # Manually pick each factor of variable for the x-axis and label it
-  hc_xAxis(categories = unique(Nobel_6$Gender),
-    title = list(text = "Gender")) |>
-  # Labelling y axis 
-  hc_add_series(data = Gender$n, name = "Gender") |>
-  hc_colors(c( "#d6c089"))
-```
-
-
-Column
--------------------------
-
-```{r, echo=FALSE}
-
-library(dplyr)
-
-Nobel_3 <- Nobel |> 
-  mutate(Cent = case_when(
-    Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
-    Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
-    Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
-    Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
-    Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
-  )) |>
-  drop_na(Gender) |>
-  count(Cent, Gender)
-
-highchart() |>
-  hc_add_series(data = Nobel_3,
-                type = "column", 
-                hcaes(x = Cent,
-                      y = n,
-                      group = Gender)) |>
-  hc_xAxis(categories = unique(Nobel_3$Cent),
-    title = list(text = "Year")) |>
-  hc_yAxis(title = list(text="Number of Laureates")) |>
-  hc_plotOptions(series = list(animation = TRUE)) |>
-  hc_legend(align = "right", 
-            verticalAlign = "top") |>
-  hc_colors(c("#d6c089"))
-```
-
-Column
--------------------------
-
-```{r}
-Nobel_10 <- Nobel |>
-  drop_na(Category, Gender) |>
-  count(Category, Gender)
-
-highchart() |>
-  hc_add_series(
-    data = Nobel_10,
-    type = "column",
-    hcaes(x = Category, y = n, group = Gender)
-  ) |>
-  hc_plotOptions(
-    column = list(stacking = "percent")
-  ) |>
-  hc_yAxis(
-    title = list(text = "Percentage of Laureates")
-  ) |>
-  hc_xAxis(categories = unique(Nobel_10$Category),
-    title = list(text = "Category")
-  )
-```
 Geographic Analysis
 ==========================
 
-Column
--------------------------
+Row {data-height=450}
+-----------------------------------------------------------------------
+
+### yeah
 
 ```{r}
 library(leaflet)
@@ -351,15 +268,26 @@ leaflet(world_nobel) |>
   )
 ```
 
-Column
--------------------------
 
-```{r, echo = FALSE}
-library(dplyr)
+more geography
+==========================
 
-Nobell <- Nobel |>
+Sidebar {.sidebar}
+-------------------------------------------------------------
+
+```{r}
+selectInput("Cent", label = "Time Period:",
+            choices = unique(Nnnobel$Cent),
+            selected = "1901-1925")
+```
+
+
+### continent
+
+```{r}
+Nnnobel <- Nobel |>
   filter(!is.na(Birth_country)) |>
-   mutate(Birth_country = recode(Birth_country,
+  mutate(Birth_country = recode(Birth_country,
     "USA"                               = "United States of America",
     "the Netherlands"                   = "Netherlands",
     "South Korea"                       = "South Korea",
@@ -402,21 +330,114 @@ Nobell <- Nobel |>
     "Tibet"                             = "China",
     "Bosnia"                            = "Bosnia and Herz."
   )) |>
-  count(Birth_country, sort = TRUE) |>
-  slice_max(n, n = 10)
+  # join continent from world_nobel (drop geometry to keep it a plain data frame)
+  left_join(
+    world_nobel |> st_drop_geometry() |> select(name, continent),
+    by = c("Birth_country" = "name")
+  ) |>
+  mutate(Cent = case_when(
+    Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
+    Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
+    Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
+    Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
+    Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
+  )) |>
+  drop_na(continent, Cent) |>
+  count(Cent, continent, name = "n")
+```
 
-
-highchart() |>
-  hc_add_series(data = Nobell,
-                type = "column", 
-                hcaes(x = Birth_country,
-                      y = n)) |>
-  hc_xAxis(categories = unique(Nobell$Birth_country),
-    title = list(text = "Country")) |>
-  hc_yAxis(title = list(text="Number of Prizes")) |>
-  hc_colors(c("#d6c089"))
-
+```{r}
+renderPlot({
+  Nnnobel |>
+    filter(Cent == input$Cent) |>
+    ggplot(aes(x = continent, y = n)) +
+    geom_col(fill = "black", colour = "gold") +
+    labs(title = paste("Nobel Prizes by Continent:", input$Cent),
+         x = "Continent", y = "Number of Prizes") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+})
 ```
 
 
+Comments {data-width=300}
 
+
+let us see if this works or not. god safe us 
+
+
+Gender analysis
+==========================
+
+### Gender Overall
+
+```{r, echo=FALSE}
+Nobel_6 <- Nobel |>
+  filter(!is.na(Gender)) |>
+  count(Gender) -> Gender
+
+highchart() |> 
+  hc_chart(type ="column",
+           options3d = list(enabled = TRUE, beta = 15, alpha = 15)) |>
+  hc_xAxis(categories = unique(Nobel_6$Gender),
+    title = list(text = "Gender")) |>
+  hc_add_series(data = Gender$n, name = "Gender") |>
+  hc_colors(c("#d6c089"))
+```
+
+### Gender by Era
+
+```{r, echo=FALSE}
+library(dplyr)
+Nobel_3 <- Nobel |> 
+  mutate(Cent = case_when(
+    Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
+    Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
+    Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
+    Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
+    Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
+  )) |>
+  drop_na(Gender) |>
+  count(Cent, Gender)
+
+highchart() |>
+  hc_add_series(data = Nobel_3,
+                type = "column", 
+                hcaes(x = Cent, y = n, group = Gender)) |>
+  hc_xAxis(categories = unique(Nobel_3$Cent),
+    title = list(text = "Year")) |>
+  hc_yAxis(title = list(text="Number of Laureates")) |>
+  hc_plotOptions(series = list(animation = TRUE)) |>
+  hc_legend(align = "right", verticalAlign = "top") |>
+  hc_colors(c("#d6c089"))
+```
+
+### Gender by Category
+
+```{r}
+Nobel_10 <- Nobel |>
+  drop_na(Category, Gender) |>
+  count(Category, Gender)
+
+highchart() |>
+  hc_add_series(
+    data = Nobel_10,
+    type = "column",
+    hcaes(x = Category, y = n, group = Gender)
+  ) |>
+  hc_plotOptions(
+    column = list(stacking = "percent")
+  ) |>
+  hc_yAxis(
+    title = list(text = "Percentage of Laureates")
+  ) |>
+  hc_xAxis(categories = unique(Nobel_10$Category),
+    title = list(text = "Category")
+  )
+```
+
+
+### Comments {data-width=300}
+
+
+let us see if this works or not. god safe us 
