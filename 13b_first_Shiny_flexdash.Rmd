@@ -33,7 +33,6 @@ library(dplyr)
 library(tidyverse)
 library(sf)
 
-
 Nobel <- read.csv("Nobel_final_data.csv")
 ```
 
@@ -95,11 +94,7 @@ Overview
 
 ```{r, include=FALSE}
 
-Nnobel <- Nobel |>
-  group_by(Prize_year) |>
-  summarise(number_of_laureates = n()) |>
-  drop_na(Prize_year)
-
+# creating data set with year groups for our render plot
 Nnnobel <- Nobel |>
   mutate(
     Cent = case_when(
@@ -122,6 +117,7 @@ Sidebar {.sidebar}
 -------------------------------------------------------------
 
 ```{r, echo=FALSE}
+# the input for our panel
 selectInput("Cent1", label = "Time Period:",
             choices = unique(Nnnobel$Cent),
             selected = "1901-1925")
@@ -146,6 +142,13 @@ renderPlot({
 ## Distribution of Nobel Laureates Over Time
 
 ```{r, echo=FALSE}
+
+#creating data set grouped by prize year
+Nnobel <- Nobel |>
+  group_by(Prize_year) |>
+  summarise(number_of_laureates = n()) |>
+  drop_na(Prize_year)
+
 highchart() |>
   hc_add_series(
     data = Nnobel,
@@ -288,7 +291,7 @@ more geography
 ==========================
 
 ```{r}
-
+#similar to code above except we join to get continents
 Nnnobel_1 <- Nobel |>
   filter(!is.na(Birth_country)) |>
   mutate(Birth_country = recode(Birth_country,
@@ -334,7 +337,7 @@ Nnnobel_1 <- Nobel |>
     "Tibet"                             = "China",
     "Bosnia"                            = "Bosnia and Herz."
   )) |>
-  # join continent from world_nobel (drop geometry to keep it a plain data frame)
+  # join continent from world_nobel and dropping geometry to have a plain data frame
   left_join(
     world_nobel |> st_drop_geometry() |> select(name, continent),
     by = c("Birth_country" = "name")
@@ -388,6 +391,7 @@ Gender analysis
 ### Gender Overall
 
 ```{r, echo=FALSE}
+#removing missing gender values
 Nobel_6 <- Nobel |>
   filter(!is.na(Gender)) |>
   count(Gender) -> Gender
@@ -404,6 +408,7 @@ highchart() |>
 ### Gender by Era
 
 ```{r, echo=FALSE}
+
 Nobel_3 <- Nobel |> 
   mutate(Cent = case_when(
     Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
@@ -448,7 +453,8 @@ highchart() |>
   ) |>
   hc_xAxis(categories = unique(Nobel_10$Category),
     title = list(text = "Category")
-  )
+  )|>
+  hc_colors(c("#d6c089","black"))
 ```
 
 
