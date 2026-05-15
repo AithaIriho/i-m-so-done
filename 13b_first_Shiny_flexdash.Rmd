@@ -57,7 +57,7 @@ knitr::include_graphics("nobel_medal.webp.png")
 Overview
 ==========================
 
-Column
+Row {data-height=400}
 -------------------------
 
 ```{r, echo=FALSE}
@@ -76,7 +76,26 @@ ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
   theme_minimal() 
 ```
 
-Column
+Generally, the number of prizes given in a year increased overtime. 
+
+Row {data-height=400}
+-------------------------
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+ Nobel |>
+  drop_na(Age) |>
+ggplot(aes(x = Age)) +
+  geom_histogram(bins = 30, binwidth = 3.5) +
+  labs(title = "Laureate Age Distribution", x = "Age", y = "Number of Laureats") +
+  theme_minimal()
+```
+
+the median age is 65 and there are some outliers close to 100 and less than 25
+
+Row {data-height=400}
 -------------------------
 
 ```{r, echo=FALSE}
@@ -109,21 +128,60 @@ highchart() |>
   hc_yAxis(title = list(text = "Number of Prizes"))
 ```
 
-Column
+
+Row {data-height=400}
 -------------------------
 
-```{r}
-library(ggplot2)
+```{r, include=FALSE}
+library(shiny)
 library(dplyr)
+library(ggplot2)
+library(flexdashboard)
 
-Nobbel <- Nobel |>
-  drop_na(Age)
-
-ggplot(data = Nobbel, aes(x = Age)) +
-  geom_histogram() +
-  labs(title = "Laureate Age Distribution", x = "Age", y = "Count") +
-  theme_minimal()
+Nnnobel <- Nobel |>
+  mutate(
+    Cent = case_when(
+      Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
+      Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
+      Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
+      Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
+      Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
+    ),
+    Cent = factor(Cent, levels = c("1901-1925","1926-1950",
+                                   "1951-1975","1976-2000","2001-2025")),
+    Category = factor(Category)
+  ) |>
+  drop_na(Category, Cent) |>
+  count(Cent, Category)
 ```
+
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+selectInput("Cent", label = "Time Period:",
+            choices = unique(Nnnobel$Cent),
+            selected = "1901-1925")
+```
+
+Row {data-height=400}
+-----------------------------------------------------------------------
+
+### Nobel Prize Categories
+
+```{r}
+renderPlot({
+  Nnnobel |>
+    filter(Cent == input$Cent) |>
+    ggplot(aes(x = Category, y = n)) +
+    geom_col() +
+    labs(title = paste("Nobel Prize Categories:", input$Cent),
+         x = "Category", y = "Number of Prizes") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+})
+```
+
 
 Gender analysis
 ==========================
@@ -132,6 +190,25 @@ Column
 -------------------------
 
 ```{r, echo=FALSE}
+Nobel_6 <- Nobel |>
+  filter(!is.na(Gender)) |>
+  count(Gender) -> Gender
+
+highchart() |> 
+  hc_chart(type ="column",
+           options3d = list(enabled = TRUE, beta = 15, alpha = 15)) |>
+  hc_xAxis(categories = unique(Nobel_6$Gender),
+    title = list(text = "Gender")) |>
+  hc_add_series(data = Gender$n, name = "Gender") |>
+  hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
+```
+
+
+Column
+-------------------------
+
+```{r, echo=FALSE}
+
 library(dplyr)
 
 Nobel_3 <- Nobel |> 
@@ -160,27 +237,9 @@ highchart() |>
   hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
 ```
 
-
 Column
 -------------------------
 
-```{r, echo=FALSE}
-Nobel_6 <- Nobel |>
-  filter(!is.na(Gender)) |>
-  count(Gender) -> Gender
-
-highchart() |> 
-  hc_chart(type ="column",
-           options3d = list(enabled = TRUE, beta = 15, alpha = 15)) |>
-  hc_xAxis(categories = unique(Nobel_6$Gender),
-    title = list(text = "Gender")) |>
-  hc_add_series(data = Gender$n, name = "Gender") |>
-  hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
-```
-
-
-Column
--------------------------
 
 ```{r}
 ggplot(Nobel, aes(x = Gender, y = Age)) +
@@ -314,8 +373,52 @@ library(dplyr)
 
 Nobell <- Nobel |>
   filter(!is.na(Birth_country)) |>
+   mutate(Birth_country = recode(Birth_country,
+    "USA"                               = "United States of America",
+    "the Netherlands"                   = "Netherlands",
+    "South Korea"                       = "South Korea",
+    "Korea"                             = "South Korea",
+    "USSR"                              = "Russia",
+    "Russian Empire"                    = "Russia",
+    "Prussia"                           = "Germany",
+    "Bavaria"                           = "Germany",
+    "Mecklenburg"                       = "Germany",
+    "Württemberg"                       = "Germany",
+    "Hesse-Kassel"                      = "Germany",
+    "West Germany"                      = "Germany",
+    "East Friesland"                    = "Germany",
+    "Schleswig"                         = "Germany",
+    "Free City of Danzig"               = "Poland",
+    "German-occupied Poland"            = "Poland",
+    "Austria-Hungary"                   = "Austria",
+    "Austrian Empire"                   = "Austria",
+    "Ottoman Empire"                    = "Turkey",
+    "Persia"                            = "Iran",
+    "British Protectorate of Palestine" = "Israel",
+    "British Mandate of Palestine"      = "Israel",
+    "British India"                     = "India",
+    "Burma"                             = "Myanmar",
+    "Tuscany"                           = "Italy",
+    "Gold Coast"                        = "Ghana",
+    "Belgian Congo"                     = "Dem. Rep. Congo",
+    "Southern Rhodesia"                 = "Zimbabwe",
+    "French Algeria"                    = "Algeria",
+    "French protectorate of Tunisia"    = "Tunisia",
+    "Czechoslovakia"                    = "Czechia",
+    "East Timor"                        = "Timor-Leste",
+    "Java, Dutch East Indies"           = "Indonesia",
+    "Faroe Islands (Denmark)"           = "Denmark",
+    "Guadeloupe, France"                = "France",
+    "British West Indies"               = "Trinidad and Tobago",
+    "Crete"                             = "Greece",
+    "Scotland"                          = "United Kingdom",
+    "Northern Ireland"                  = "United Kingdom",
+    "Tibet"                             = "China",
+    "Bosnia"                            = "Bosnia and Herz."
+  )) |>
   count(Birth_country, sort = TRUE) |>
   slice_max(n, n = 10)
+
 
 highchart() |>
   hc_add_series(data = Nobell,
@@ -347,3 +450,145 @@ highchart() |>
   hc_yAxis(title = list(text = "Prize Amount")) |>
   hc_colors(c("#F8BBD0", "#F48FB1", "#F06292", "#EC407A", "#D81B60"))
 ```
+
+
+
+```{r, include=FALSE}
+library(shiny)
+library(dplyr)
+library(ggplot2)
+library(flexdashboard)
+
+Nnnobel <- Nobel |>
+  mutate(
+    Cent = case_when(
+      Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
+      Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
+      Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
+      Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
+      Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
+    ),
+    Cent = factor(Cent, levels = c("1901-1925","1926-1950",
+                                   "1951-1975","1976-2000","2001-2025")),
+    Category = factor(Category)
+  ) |>
+  drop_na(Category, Cent) |>
+  count(Cent, Category)
+```
+
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+selectInput("Cent", label = "Time Period:",
+            choices = unique(Nnnobel$Cent),
+            selected = "1901-1925")
+```
+
+Column
+-----------------------------------------------------------------------
+
+### Nobel Prize Categories
+
+```{r}
+renderPlot({
+  Nnnobel |>
+    filter(Cent == input$Cent) |>
+    ggplot(aes(x = Category, y = n)) +
+    geom_col() +
+    labs(title = paste("Nobel Prize Categories:", input$Cent),
+         x = "Category", y = "Number of Prizes") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+})
+```
+
+trial
+==========================
+
+```{r, include=FALSE}
+library(shiny)
+library(dplyr)
+library(ggplot2)
+library(flexdashboard)
+library(highcharter)
+
+Nnobel <- Nobel |>
+  group_by(Prize_year) |>
+  summarise(number_of_laureates = n()) |>
+  drop_na(Prize_year)
+
+Nnnobel <- Nobel |>
+  mutate(
+    Cent = case_when(
+      Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
+      Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
+      Prize_year >= 1951 & Prize_year <= 1975 ~ "1951-1975",
+      Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
+      Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
+    ),
+    Cent = factor(Cent, levels = c("1901-1925","1926-1950",
+                                   "1951-1975","1976-2000","2001-2025")),
+    Category = factor(Category)
+  ) |>
+  drop_na(Category, Cent) |>
+  count(Cent, Category)
+```
+
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+selectInput("Cent", label = "Time Period:",
+            choices = unique(Nnnobel$Cent),
+            selected = "1901-1925")
+```
+
+Row {data-height=400}
+-----------------------------------------------------------------------
+
+### Nobel Prize Categories (Interactive)
+
+```{r}
+renderPlot({
+  Nnnobel |>
+    filter(Cent == input$Cent) |>
+    ggplot(aes(x = Category, y = n)) +
+    geom_col() +
+    labs(title = paste("Nobel Prize Categories:", input$Cent),
+         x = "Category", y = "Number of Prizes") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+})
+```
+
+### Distribution of Nobel Laureates Over Time
+
+```{r, echo=FALSE}
+ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
+  geom_point(colour = "orange") +
+  geom_smooth(se = FALSE, colour = "pink") +
+  labs(title = "Distribution of Nobel Laureates Over Time",
+       x = "Year", y = "Count") +
+  theme_minimal()
+```
+
+Row {data-height=400}
+-----------------------------------------------------------------------
+
+### Laureate Age Distribution
+
+```{r}
+Nobel |>
+  drop_na(Age) |>
+  ggplot(aes(x = Age)) +
+  geom_histogram(bins = 30, binwidth = 3.5) +
+  labs(title = "Laureate Age Distribution",
+       x = "Age", y = "Number of Laureates") +
+  theme_minimal()
+```
+
+### Comments {data-width=300}
+
+
+let us see if this works or not. god safe us 
