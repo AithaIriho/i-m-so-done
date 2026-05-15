@@ -459,4 +459,18 @@ Female representation gradually increased across time periods, especially after 
 Peace and Literature show higher female representation, while categories such as Physics and Economics remain heavily male-dominated.
 
 
+Conclusion
+==========================
+
+In conclusion , the number of Nobel laureates has increased over time, reflecting a shift toward group work and recognition. While early Nobel Prizes were concentrated in categories like Physics, , the distribution has gradually become more balanced, indicating a broader appreciation of contributions across disciplines. The age distribution further shows that Nobel Prizes are typically awarded later in life, highlighting the long-term nature of impactful work and the delay between discovery and recognition.
+
+
+However, significant disparities remain. The gender analysis demonstrates a strong historical imbalance, with male laureates overwhelmingly dominating total counts. Although female representation has increased in more recent decades, progress has been slow and uneven across categories, with scientific fields still showing the greatest gender gaps. This suggests that gender inequality in Nobel recognition is shaped by both historical exclusion and structural barriers within certain disciplines.
+
+
+Geographically, Nobel Prizes are highly concentrated in a small number of countries, particularly in North America and Western Europe. Large regions of the world remain underrepresented, reflecting global inequalities in access to education, research funding, and institutional support. Additionally, because the data is based on birth country, these patterns also capture migration trends and the movement of talent toward well-resourced regions.
+
+
+Altogether, these findings show that while the Nobel Prize has evolved to reflect changes in science and society, it continues to be influenced by broader social, historical, and structural factors which is reflected in the disparities.
+
  
