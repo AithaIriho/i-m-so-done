@@ -1,0 +1,136 @@
+:root{
+  --bg: #f8f8f8;
+  --card: #ffffff;
+
+  --text: #1a1a1a;
+  --muted: #6e6e6e;
+
+  --heading: #c9a646;   /* gold */
+  --h2: #a8892f;
+
+  --border: #e6e6e6;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --radius: 16px;
+
+  --gold: #c9a646;
+  --gold-soft: #f4e7c1;
+}
+
+/* ===============================
+   BACKGROUND (clean + elegant)
+   =============================== */
+
+body{
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  color: var(--text);
+
+  background:
+    radial-gradient(800px 400px at 10% 0%, #fdf9f0 0%, transparent 60%),
+    var(--bg);
+}
+
+/* ===============================
+   CARDS (minimal luxury)
+   =============================== */
+
+.section.level1{
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.section.level1:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+/* ===============================
+   TITLES
+   =============================== */
+
+h1{
+  font-family: "Qwitcher Grypen", cursive;
+  font-size: 64px;
+  text-align: center;
+  color: var(--heading);
+  margin-bottom: 10px;
+}
+
+h2{
+  font-size: 18px;
+  color: var(--h2);
+  font-weight: 700;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+/* ===============================
+   TEXT
+   =============================== */
+
+p{
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* ===============================
+   NAVBAR (black + gold accent)
+   =============================== */
+
+.navbar{
+  background-color: #111 !important;
+  border-bottom: 2px solid var(--gold);
+}
+
+.navbar-brand{
+  color: var(--gold) !important;
+  font-weight: 700;
+}
+
+/* ===============================
+   LINKS
+   =============================== */
+
+a{
+  color: var(--gold);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover{
+  text-decoration: underline;
+}
+
+/* ===============================
+   SUBTLE GOLD ACCENTS
+   =============================== */
+
+.section.level1::before{
+  content: "";
+  display: block;
+  height: 3px;
+  width: 40px;
+  background: var(--gold);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* ===============================
+   SCROLLBAR
+   =============================== */
+
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6c089;
+  border-radius: 10px;
+}

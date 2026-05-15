@@ -3,6 +3,7 @@ title: "The Nobel Prize"
 output: 
   flexdashboard::flex_dashboard:
     theme: flatly
+    css: styles.css
     orientation: rows
     vertical_layout: fill
 runtime: shiny
