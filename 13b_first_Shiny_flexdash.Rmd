@@ -48,7 +48,6 @@ In this Shiny dashboard, we analyze Nobel Prize data collected from the official
 
 Using this project, we explore historical trends in Nobel Prize awards across different time periods and categories. We also investigate patterns related to gender representation and geographical distribution in order to better understand inequalities and changes in recognition over time.
 
-
 #### Data Sources
 
 - [Nobel Prize Website](https://www.nobelprize.org/)
@@ -95,11 +94,15 @@ Overview
 ```{r, include=FALSE}
 
 Nnobel <- Nobel |>
+  # Group data by year of prize awarded
   group_by(Prize_year) |>
+  # Count number of laureates per year
   summarise(number_of_laureates = n()) |>
+  # Drop rows where Prize_year has missing values
   drop_na(Prize_year)
 
 Nnnobel <- Nobel |>
+  # Create time periods based on Prize_year
   mutate(
     Cent = case_when(
       Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
@@ -108,11 +111,15 @@ Nnnobel <- Nobel |>
       Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
       Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
     ),
+    # Convert Cent variable into an orderd factor 
     Cent = factor(Cent, levels = c("1901-1925","1926-1950",
                                    "1951-1975","1976-2000","2001-2025")),
+    # Ensure Category is a categorical variable with factor levels for plotting 
     Category = factor(Category)
   ) |>
+  # Removes rows wehre Category or Cent has missing values
   drop_na(Category, Cent) |>
+  # Count number of laureates in each combiantion of Cent and Category
   count(Cent, Category)
 ```
 
@@ -121,8 +128,11 @@ Sidebar {.sidebar}
 -------------------------------------------------------------
 
 ```{r, echo=FALSE}
+# Create an input for choosing a time period in Cent
 selectInput("Cent1", label = "Time Period:",
+            # Choices of time periods from the dataset 
             choices = unique(Nnnobel$Cent),
+            # Default selected time period
             selected = "1901-1925")
 ```
 
@@ -131,12 +141,16 @@ selectInput("Cent1", label = "Time Period:",
 ```{r, echo=FALSE}
 renderPlot({
   Nnnobel |>
+    # Filter data to only include the selected time period from the input
     filter(Cent == input$Cent1) |>
+    # Create bar chart showing number of Nobel Prizes per category
     ggplot(aes(x = Category, y = n)) +
     geom_col(fill = "black", colour = "#d6c089") +
+    # Label axes and add title changing based on the selected time period
     labs(title = paste("Nobel Prize Categories:", input$Cent1),
          x = "Category", y = "Number of Prizes") +
     theme_minimal() +
+    # Alterations so the axes do not overlap with the axes names
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 })
 ```
@@ -148,20 +162,26 @@ Overview Continued
 ### Distribution of Nobel Laureates Over Time
 
 ```{r, echo=FALSE}
+# Create an interactive line graph
 highchart() |>
+  # Add a line showing thee number of laureates per year
   hc_add_series(
     data = Nnobel,
     type = "line",
     hcaes(x = Prize_year, y = number_of_laureates),
     name = "Number of Laureates"
   ) |>
+  # # Maunually map x-axis to Prize_year and map y-axis to number of laureates
   hc_title(text = "Nobel Laureates Over Time")|>
   hc_xAxis(categories = unique(Nnobel$Prize_year),
     title = list(text = "Year")) |>
   hc_yAxis(title = list(text="Number of Laureates")) |>
+  # Allow for smoother animations
   hc_plotOptions(series = list(animation = TRUE)) |>
+  # Position legend in top-right corner
   hc_legend(align = "right", 
             verticalAlign = "top") |>
+  # Set graph colour theme
   hc_colors(c("#d6c089"))
 ```
 
@@ -170,9 +190,12 @@ highchart() |>
 
 ```{r}
 Nobel |>
+  # Remove rows where Age has missing values 
   drop_na(Age) |>
+  # Create histogram of distribution of Laureates' ages
   ggplot(aes(x = Age)) +
   geom_histogram(bins = 30, binwidth = 3.5, fill = "black", colour = "#d6c089") +
+  # Add labels for axes
   labs(title = "Laureate Age Distribution",
        x = "Age", y = "Number of Laureates") +
   theme_minimal()
@@ -195,7 +218,7 @@ Row {data-height=450}
 
 ```{r}
 
-# creating a country_count data set with names matching earth data
+# Create a country_count data set with names matching earth data
 nobel_count <- Nobel |>
   filter(!is.na(Birth_country)) |>
   mutate(Birth_country = recode(Birth_country,
@@ -242,17 +265,17 @@ nobel_count <- Nobel |>
     "Bosnia"                            = "Bosnia and Herz."
   )) |>
   group_by(Birth_country) |>
-  summarise(total = n()) # getting the counts for each country as total
+  summarise(total = n()) # Get the counts for each country as total
 
-# creating a data set with country coordinates and boundaries 
+# Create a data set with country coordinates and boundaries 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
-# Merging our country_count data set with the coordinate data set
+# Merge our country_count data set with the coordinate data set
 world_nobel <- world |>
   left_join(nobel_count, by = c("name" = "Birth_country")) |>
   mutate(total = replace_na(total, 0)) #replacing nas with 0 
 
-# selecting a color palette and assigning bins 
+# Select a color palette and assign bins 
 pal <- colorBin(
   palette  = "YlOrRd",
   domain   = world_nobel$total[world_nobel$total > 0],
@@ -269,7 +292,7 @@ leaflet(world_nobel) |>
     fillOpacity  = ~ifelse(total == 0, 0.3, 0.8),
     color        = "white",
     weight       = 0.5,
-    label        = ~paste0(name, ": ", ifelse(total == 0, "None", paste0(total, " Nobel Prize(s)"))),# saying none for countries without prizes
+    label        = ~paste0(name, ": ", ifelse(total == 0, "None", paste0(total, " Nobel Prize(s)"))),# Saying none for countries without prizes
     highlight    = highlightOptions(
       weight       = 3,
       color        = "#333",
@@ -336,7 +359,7 @@ Nnnobel_1 <- Nobel |>
     "Tibet"                             = "China",
     "Bosnia"                            = "Bosnia and Herz."
   )) |>
-  # join continent from world_nobel (drop geometry to keep it a plain data frame)
+  # Join continent from world_nobel (drop geometry to keep it a plain data frame)
   left_join(
     world_nobel |> st_drop_geometry() |> select(name, continent),
     by = c("Birth_country" = "name")
@@ -358,6 +381,7 @@ Sidebar {.sidebar}
 
 
 ```{r, echo=FALSE}
+# Create an input menu for choosing a time period
 selectInput("Cent", label = "Time Period:",
             choices = unique(Nnnobel_1$Cent),
             selected = "1901-1925")
@@ -370,9 +394,12 @@ selectInput("Cent", label = "Time Period:",
 ```{r, echo=FALSE}
 renderPlot({
   Nnnobel_1 |>
+    # Filter data based on the selected time period from input 
     filter(Cent == input$Cent) |>
+    # Create bar chart of number of prizes per continent
     ggplot(aes(x = continent, y = n)) +
     geom_col(fill = "black", colour = "#d6c089") +
+    # Add labels, including title that changes based on time period
     labs(title = paste("Nobel Prizes by Continent:", input$Cent),
          x = "Continent", y = "Number of Prizes") +
     theme_minimal() +
@@ -392,11 +419,14 @@ Gender analysis
 ```{r, echo=FALSE}
 Nobel_6 <- Nobel |>
   filter(!is.na(Gender)) |>
+  # Count and store Gender for plotting
   count(Gender) -> Gender
 
 highchart() |> 
+  # Create a 3D column graphs showing gender distribution 
   hc_chart(type ="column",
            options3d = list(enabled = TRUE, beta = 15, alpha = 15)) |>
+  # Set labels for axes
   hc_xAxis(categories = unique(Nobel_6$Gender),
     title = list(text = "Gender")) |>
   hc_add_series(data = Gender$n, name = "Gender") |>
@@ -407,6 +437,7 @@ highchart() |>
 
 ```{r, echo=FALSE}
 Nobel_3 <- Nobel |> 
+  # Define time periods
   mutate(Cent = case_when(
     Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
     Prize_year >= 1926 & Prize_year <= 1950 ~ "1926-1950",
@@ -414,28 +445,35 @@ Nobel_3 <- Nobel |>
     Prize_year >= 1976 & Prize_year <= 2000 ~ "1976-2000",
     Prize_year >= 2001 & Prize_year <= 2025 ~ "2001-2025"
   )) |>
+  # Remove rows of missing gender values 
   drop_na(Gender) |>
+  # Count number of laureates per time period and gender
   count(Cent, Gender)
 
+# Create a column graph of gender distribution across time periods
 highchart() |>
   hc_add_series(data = Nobel_3,
                 type = "column", 
                 hcaes(x = Cent, y = n, group = Gender)) |>
+  # Set labels for axes
   hc_xAxis(categories = unique(Nobel_3$Cent),
     title = list(text = "Year")) |>
   hc_yAxis(title = list(text="Number of Laureates")) |>
   hc_plotOptions(series = list(animation = TRUE)) |>
   hc_legend(align = "right", verticalAlign = "top") |>
+  # Set colour pallete for graph
   hc_colors(c("#d6c089", "black"))
 ```
 
 ### Gender by Category
 
 ```{r}
+# Create dataset counting laureated by category and gender
 Nobel_10 <- Nobel |>
   drop_na(Category, Gender) |>
   count(Category, Gender)
 
+# Create column graph of category grouped by gender
 highchart() |>
   hc_add_series(
     data = Nobel_10,
@@ -445,11 +483,13 @@ highchart() |>
   hc_plotOptions(
     column = list(stacking = "percent")
   ) |>
+  # Set labels for axes
   hc_yAxis(
     title = list(text = "Percentage of Laureates")
   ) |>
   hc_xAxis(categories = unique(Nobel_10$Category),
     title = list(text = "Category")
+    # Set colour pallettes
   ) |>
   hc_colors(c("#d6c089", "black"))
 ```
