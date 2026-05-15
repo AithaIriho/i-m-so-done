@@ -110,21 +110,21 @@ Nnnobel <- Nobel |>
 Sidebar {.sidebar}
 -------------------------------------------------------------
 
-```{r}
-selectInput("Cent", label = "Time Period:",
+```{r, echo=FALSE}
+selectInput("Cent1", label = "Time Period:",
             choices = unique(Nnnobel$Cent),
             selected = "1901-1925")
 ```
 
 ## Nobel Prize Categories (Interactive)
 
-```{r}
+```{r, echo=FALSE}
 renderPlot({
   Nnnobel |>
-    filter(Cent == input$Cent) |>
+    filter(Cent == input$Cent1) |>
     ggplot(aes(x = Category, y = n)) +
     geom_col(fill = "black", colour = "gold") +
-    labs(title = paste("Nobel Prize Categories:", input$Cent),
+    labs(title = paste("Nobel Prize Categories:", input$Cent1),
          x = "Category", y = "Number of Prizes") +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -135,12 +135,21 @@ renderPlot({
 ## Distribution of Nobel Laureates Over Time
 
 ```{r, echo=FALSE}
-ggplot(Nnobel, aes(x = Prize_year, y = number_of_laureates)) +
-  geom_point(colour = "black") +
-  geom_smooth(se = FALSE, colour = "gold") +
-  labs(title = "Distribution of Nobel Laureates Over Time",
-       x = "Year", y = "Count") +
-  theme_minimal()
+highchart() |>
+  hc_add_series(
+    data = Nnobel,
+    type = "line",
+    hcaes(x = Prize_year, y = number_of_laureates),
+    name = "Number of Laureates"
+  ) |>
+  hc_title(text = "Nobel Laureates Over Time")|>
+  hc_xAxis(categories = unique(Nnobel$Prize_year),
+    title = list(text = "Year")) |>
+  hc_yAxis(title = list(text="Number of Laureates")) |>
+  hc_plotOptions(series = list(animation = TRUE)) |>
+  hc_legend(align = "right", 
+            verticalAlign = "top") |>
+  hc_colors(c("#d6c089"))
 ```
 
 
@@ -272,20 +281,12 @@ leaflet(world_nobel) |>
 more geography
 ==========================
 
-Sidebar {.sidebar}
--------------------------------------------------------------
-
 ```{r}
-selectInput("Cent", label = "Time Period:",
-            choices = unique(Nnnobel$Cent),
-            selected = "1901-1925")
-```
+library(dplyr)
+library(tidyverse)
+library(sf)
 
-
-### continent
-
-```{r}
-Nnnobel <- Nobel |>
+Nnnobel_1 <- Nobel |>
   filter(!is.na(Birth_country)) |>
   mutate(Birth_country = recode(Birth_country,
     "USA"                               = "United States of America",
@@ -346,9 +347,24 @@ Nnnobel <- Nobel |>
   count(Cent, continent, name = "n")
 ```
 
-```{r}
+
+Sidebar {.sidebar}
+-------------------------------------------------------------
+
+
+```{r, echo=FALSE}
+selectInput("Cent", label = "Time Period:",
+            choices = unique(Nnnobel_1$Cent),
+            selected = "1901-1925")
+```
+
+
+
+## continent
+
+```{r, echo=FALSE}
 renderPlot({
-  Nnnobel |>
+  Nnnobel_1 |>
     filter(Cent == input$Cent) |>
     ggplot(aes(x = continent, y = n)) +
     geom_col(fill = "black", colour = "gold") +
@@ -358,6 +374,7 @@ renderPlot({
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 })
 ```
+
 
 
 Comments {data-width=300}
