@@ -58,7 +58,7 @@ Using this project, we explore historical trends in Nobel Prize awards across di
 
 #### GitHub
 
-Here's a link to our [code](https://github.com/)
+Here's a link to our [code](https://github.com/AithaIriho/i-m-so-done.git)
  
 Row {data-width=6}
 -------------------------------------
