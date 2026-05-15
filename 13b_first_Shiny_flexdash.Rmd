@@ -92,9 +92,8 @@ Overview
 
 ```{r, include=FALSE}
 
-<<<<<<< HEAD
+
 # creating data set with year groups for our render plot
-=======
 Nnobel <- Nobel |>
   # Group data by year of prize awarded
   group_by(Prize_year) |>
@@ -103,7 +102,7 @@ Nnobel <- Nobel |>
   # Drop rows where Prize_year has missing values
   drop_na(Prize_year)
 
->>>>>>> 671952dc42bd75ce521d5f4b127e7bca20f7da42
+
 Nnnobel <- Nobel |>
   # Create time periods based on Prize_year
   mutate(
@@ -131,11 +130,8 @@ Sidebar {.sidebar}
 -------------------------------------------------------------
 
 ```{r, echo=FALSE}
-<<<<<<< HEAD
-# the input for our panel
-=======
+
 # Create an input for choosing a time period in Cent
->>>>>>> 671952dc42bd75ce521d5f4b127e7bca20f7da42
 selectInput("Cent1", label = "Time Period:",
             # Choices of time periods from the dataset 
             choices = unique(Nnnobel$Cent),
@@ -169,7 +165,7 @@ Overview Continued
 ### Distribution of Nobel Laureates Over Time
 
 ```{r, echo=FALSE}
-<<<<<<< HEAD
+
 
 #creating data set grouped by prize year
 Nnobel <- Nobel |>
@@ -177,9 +173,8 @@ Nnobel <- Nobel |>
   summarise(number_of_laureates = n()) |>
   drop_na(Prize_year)
 
-=======
+
 # Create an interactive line graph
->>>>>>> 671952dc42bd75ce521d5f4b127e7bca20f7da42
 highchart() |>
   # Add a line showing thee number of laureates per year
   hc_add_series(
@@ -376,11 +371,8 @@ Nnnobel_1 <- Nobel |>
     "Tibet"                             = "China",
     "Bosnia"                            = "Bosnia and Herz."
   )) |>
-<<<<<<< HEAD
+
   # join continent from world_nobel and dropping geometry to have a plain data frame
-=======
-  # Join continent from world_nobel (drop geometry to keep it a plain data frame)
->>>>>>> 671952dc42bd75ce521d5f4b127e7bca20f7da42
   left_join(
     world_nobel |> st_drop_geometry() |> select(name, continent),
     by = c("Birth_country" = "name")
@@ -512,14 +504,10 @@ highchart() |>
   ) |>
   hc_xAxis(categories = unique(Nobel_10$Category),
     title = list(text = "Category")
-<<<<<<< HEAD
-  )|>
-  hc_colors(c("#d6c089","black"))
-=======
     # Set colour pallettes
   ) |>
   hc_colors(c("#d6c089", "black"))
->>>>>>> 671952dc42bd75ce521d5f4b127e7bca20f7da42
+
 ```
 
 
@@ -534,13 +522,13 @@ Peace and Literature show higher female representation, while categories such as
 Conclusion
 ==========================
 
-In conclusion , the number of Nobel laureates has increased over time, reflecting a shift toward group work and recognition. While early Nobel Prizes were concentrated in categories like Physics, , the distribution has gradually become more balanced, indicating a broader appreciation of contributions across disciplines. The age distribution further shows that Nobel Prizes are typically awarded later in life, highlighting the long-term nature of impactful work and the delay between discovery and recognition.
+In conclusion, the number of Nobel laureates has increased over time which shows a shift toward group work and recognition. Additionally, the age distribution shows that Nobel Prizes are typically awarded later in life, highlighting the long term nature of impact full work and the delay between discovery and recognition. Early Nobel Prizes were concentrated in categories like Physics but overtime, the distribution has become more balanced, indicating a balanced appreciation for all the disciplines.
 
 
-However, significant disparities remain. The gender analysis demonstrates a strong historical imbalance, with male laureates overwhelmingly dominating total counts. Although female representation has increased in more recent decades, progress has been slow and uneven across categories, with scientific fields still showing the greatest gender gaps. This suggests that gender inequality in Nobel recognition is shaped by both historical exclusion and structural barriers within certain disciplines.
+However, significant gender and geographic disparities remain. The gender analysis demonstrates a strong imbalance, with male laureates overwhelmingly dominating total counts. Although female representation has increased in more recent decades, progress has been slow and uneven across categories, with scientific fields still showing the greatest gender gaps. This imbalance suggests that gender inequality in Nobel recognition is shaped by both historical exclusion and structural barriers within certain disciplines.
 
 
-Geographically, Nobel Prizes are highly concentrated in a small number of countries, particularly in North America and Western Europe. Large regions of the world remain underrepresented, reflecting global inequalities in access to education, research funding, and institutional support. Additionally, because the data is based on birth country, these patterns also capture migration trends and the movement of talent toward well-resourced regions.
+Geographically, Nobel Prizes are highly concentrated in a small number of countries, particularly in North America and Western Europe. Large regions of the world remain underrepresented, reflecting global inequalities in access to education, research funding, and institutional support.
 
 
 Altogether, these findings show that while the Nobel Prize has evolved to reflect changes in science and society, it continues to be influenced by broader social, historical, and structural factors which is reflected in the disparities.
