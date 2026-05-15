@@ -18,6 +18,21 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(ggplot2)
 library(highcharter)
+library(shiny)
+library(dplyr)
+library(ggplot2)
+library(flexdashboard)
+library(highcharter)
+library(leaflet)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(dplyr)
+library(sf)
+library(tidyr)
+library(dplyr)
+library(tidyverse)
+library(sf)
+
 
 Nobel <- read.csv("Nobel_final_data.csv")
 ```
@@ -50,6 +65,7 @@ Row {data-width=6}
 
 Column {data-width=6}
 -------------------------------------
+Do you know what all these following women have in common ? 
 
 - Rosalind Franklin
 
@@ -78,11 +94,6 @@ Overview
 ==========================
 
 ```{r, include=FALSE}
-library(shiny)
-library(dplyr)
-library(ggplot2)
-library(flexdashboard)
-library(highcharter)
 
 Nnobel <- Nobel |>
   group_by(Prize_year) |>
@@ -181,12 +192,6 @@ Row {data-height=450}
 ### yeah
 
 ```{r}
-library(leaflet)
-library(rnaturalearth)
-library(rnaturalearthdata)
-library(dplyr)
-library(sf)
-library(tidyr)
 
 # creating a country_count data set with names matching earth data
 nobel_count <- Nobel |>
@@ -283,9 +288,6 @@ more geography
 ==========================
 
 ```{r}
-library(dplyr)
-library(tidyverse)
-library(sf)
 
 Nnnobel_1 <- Nobel |>
   filter(!is.na(Birth_country)) |>
@@ -402,7 +404,6 @@ highchart() |>
 ### Gender by Era
 
 ```{r, echo=FALSE}
-library(dplyr)
 Nobel_3 <- Nobel |> 
   mutate(Cent = case_when(
     Prize_year >= 1901 & Prize_year <= 1925 ~ "1901-1925",
